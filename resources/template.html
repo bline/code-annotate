@@ -1,0 +1,168 @@
+<!DOCTYPE html><html lang="en">
+<!-- # code-annotate bootstrap template -->
+<!--
+## plugins
+
+The plugins object represents all the plugins compiled renderings.
+To access these, we have two methods
+
+### plugin methods
+
+* render(type[, joinOn) -
+  Returns a string of all the plugins renderings of `type`
+  joined together on `joinOn`.
+
+* renderOne(type) -
+  Returns a string of the last plugin which can render `type`.
+  We use the last plugin so that plugins further down
+  can override.
+
+### plugin types
+
+There are currently 10 predefined types of renderings. These types divide the
+rendering up so that rendering plugins can easily change the layout but still
+have all plugin data loaded in a consistent way.
+
+**Types are:**
+-->
+
+<head>
+  <!--
+* title - the title for the `<head>` -->
+  <%= plugins.renderOne('title') %>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <!--
+* meta - list of `<meta>` -->
+  <%= plugins.render('meta') %>
+  <!--
+* stylesheet - list of `<link>` -->
+  <%= plugins.render('stylesheet') %>
+  <!--
+* headRaw - plugin raw tags (used for directives) -->
+  <%= plugins.render('headRaw') %>
+  <!--
+* style = list of plugin `<style>` tags -->
+  <%= plugins.render('css') %>
+</head>
+<body>
+  <div class="container">
+    <div id="header" class="jumbotron">
+      <!--
+* headerTitle - single raw plugin title value for main display header -->
+      <h1><%= plugins.renderOne('headerTitle') %><h1>
+      <p>
+      <!--
+* headerDescription - list of headerDescription raw html values for main display header. -->
+        <%= plugins.render('headerDescription', '</p><p>') %>
+      </p>
+    </div>
+<!--
+
+* script - plugin `<script src="">` includes. Things like `bootstrap` and `jquery`.
+  All plugins allow you to set url's to these so you can use local
+  copies. All plugins default to some CDN.
+
+* initScript - used for plugins client side initialization. Things like
+  `hljs.initHighlightingOnLoad()`
+
+## annotation
+
+The `annotation` data available to the template is an array
+of file objects. Each object having it's rendered documents (comments),
+and rendered code (usually highlighted) in an array called `sections`. 
+
+Each section represents the comment and the code the followed up to
+the next comment or end of file. If code is the first thing in the file,
+the `docs*` attributes will be empty. If comment is the last thing
+in the file, the `code*` attributes will be empty. In both cases
+the line numbers will be consistent.
+
+The data structure for `annotation` looks like:
+
+```javascript
+[
+  { relative: 'relative path to file from process cwd',
+    path: 'path specified to the file',
+    lang: 'the language (ext with dot) or name if not dot in file',
+    ext: 'the file extension',
+    sections: [ 
+      { docsText: 'raw comment text',
+        docsRendered: 'comments modified by plugins',
+        docsLine: 'starting line number in file for this comment',
+
+        codeText: 'raw code',
+        codeRendered: 'code modified by plugins',
+        codeLine: 'starting line number in file for code' },
+      { docsText: ... }
+      ...
+    ]
+  }
+]
+
+```
+-->
+    <div id="nav">
+      <ul class="nav nav-tabs" role="tablist">
+        <!-- Loop over each file and present a navigation link to activate the tab.  -->
+        <% _.forEach(annotation, function (file, i) { %>
+          <li role="presentation" class="<%= i === 0 ? 'active' : '' %>">
+            <a href="#<%= file.id %>" role="tab" data-toggle="tab"><%= file.relative %></a>
+          </li>
+        <% }); %>
+      </ul>
+    </div>
+    <div class="tab-content file-content">
+      <% _.forEach(annotation, function (file, i) { %>
+        <div role="tabpanel" class="tab-pane fade<%= i === 0 ? ' in active' : '' %>" id="<%= file.id %>">
+          <table class="file-table">
+            <% _.forEach(file.sections, function (section, i) { %>
+              <tr>
+                <td class="file-docs">
+                  <%= section.docsRendered %>
+                </td>
+                <!-- If no code text, leave an empty cell for formatting -->
+                <td class="file-code">
+                  <% if (!(/^\s*$/).test(section.codeText)) { %>
+                    <%= section.codeRendered %>
+                  <% } else { %>
+                    &nbsp;
+                  <% } %>
+                </td>
+              </tr>
+            <% }); %>
+          </table>
+        </div>
+      <% }); %>
+    </div>
+  </div>
+  <%= plugins.render('script') %>
+  <script type="text/javascript">
+    $(function () {
+      var $header = $('#header');
+      $('#nav').affix({
+        offset: {
+          top: function () {
+            return $header.offset().top + $header.outerHeight(true);
+          }
+        }
+      });
+    });
+  </script>
+  <%= plugins.render('initScript') %>
+  <div id="footer">
+    <div class="container">
+      <p class="muted">
+        <%= plugins.render('footer') %>
+      </p>
+    </div>
+  </div>
+</body></html>  
+<!--
+## COPYRIGHT
+
+Copyright (C) 2014 Scott Beck, all rights reserved
+
+Licensed under the MIT license
+
+-->

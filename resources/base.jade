@@ -1,0 +1,18 @@
+doctype html
+html(lang="en")
+  head
+    meta(charset="utf-8")
+    != render('meta')
+    != renderOne('title')
+    != render('stylesheet')
+    != render('headExtra')
+  body
+    #nav
+      != renderOne('nav')
+    #content
+      != renderOne('content')
+    #footer
+      != renderOne('footer')
+    != render('script')
+    != render('initScript')
+

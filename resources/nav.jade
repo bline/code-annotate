@@ -1,0 +1,15 @@
+
+#nav
+  ul.anno-nav-root
+    +nav(annotation.sections)
+
+mixin nav(section)
+  li.anno-nav
+    if section.href
+      a.anno-nav-link(href=href)= section.title
+    else
+      section.title
+  if section.sections
+    ul.anno-nav-subsection
+      each name, section in section.sections
+        +nav(section)
